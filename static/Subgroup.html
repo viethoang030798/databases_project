@@ -1,0 +1,336 @@
+<<<<<<< HEAD
+<button onclick="post()"> ADD NEW Subgroup</button>
+<div id="form2"></div>
+<div id="Subgroup"></div>
+<div id="form"></div>
+<script>
+var arrayOfSubgroups;
+listSubgroups();
+function listSubgroups(){
+	getSubgroups();
+	var tableContent="<table><tr><th>Code</th><th>Department</th></tr>";
+	console.log(arrayOfSubgroups);
+	for(var i=0;i<arrayOfSubgroups.length;i++){
+		tableContent+= "<tr><td>" + arrayOfSubgroups[i].code +"</td><td>"+ arrayOfSubgroups[i].department +"</td>";
+		//add edit and delete
+		tableContent+="<td><button onClick=edit('" +arrayOfSubgroups[i].url+ "')>Edit</button></td><td><button onClick=deleteC('" +arrayOfSubgroups[i].url+ "')>Delete</button></td></tr>";
+	}
+	tableContent+= "</table>";
+	console.log(tableContent);
+	document.getElementById("Subgroup").innerHTML = tableContent;
+}
+function getSubgroups(){
+	var request = new XMLHttpRequest();
+	request.open("GET", "http://localhost:8210/Subgroups/", false);
+	//var user_and_pass = document.getElementById("user").value + ":" +  document.getElementById("password").value;
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.send();
+	arrayOfSubgroups = JSON.parse(request.responseText);
+}
+function getSubgroup(url){
+	var request = new XMLHttpRequest();
+	request.open("GET", url, false);
+	//var user_and_pass = document.getElementById("user").value + ":" +  document.getElementById("password").value;
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.send();
+	arrayOfSubgroup = JSON.parse(request.responseText);
+	return arrayOfSubgroup;
+}
+function edit(url){
+	if(url!=null){
+		var Subgroup = getSubgroup(url);
+		//create form
+		var f = document.createElement("form");
+		f.setAttribute("id", "SubgroupForm");
+		var i = document.createElement("input"); //input element, text
+		i.setAttribute('type',"text");
+		i.setAttribute('value',Subgroup.code);
+		i.setAttribute('name',"code");
+		var i3 = document.createElement("input"); //input element, text
+		i3.setAttribute('type',"text");
+		i3.setAttribute('value',Subgroup.department);
+		i3.setAttribute('name',"department");
+		var h = document.createElement("input"); //input element, text
+		h.setAttribute('type',"hidden");
+		h.setAttribute('value',Subgroup.url);
+		h.setAttribute('name',"url");
+		f.appendChild(h);
+		var l = document.createElement("label"); //input element, text
+		l.innerHTML = "Code";
+		f.appendChild(l);
+		l.setAttribute("for",i);
+		f.appendChild(i);
+		f.appendChild(document.createElement("br"));
+		var l3 = document.createElement("label"); //input element, text
+		l3.innerHTML = "Department";
+		f.appendChild(l3);
+		l.setAttribute("for",i3);
+		f.appendChild(i3);
+		f.appendChild(document.createElement("br"));
+		var b = document.createElement("button"); //input element, text
+		var buttonurl = "save('" + url + "')";
+		b.setAttribute('onClick',buttonurl);
+		b. innerHTML ="Save Subgroup";
+		f.appendChild(b);
+		console.log(String(f));
+		document.getElementById("form").appendChild(f);
+	}
+}
+function post(){
+	if(1){
+		var Subgroup = {code:"", department:""};
+		//create form
+		var f = document.createElement("form");
+		f.setAttribute("id", "SubgroupForm");
+		var i = document.createElement("input"); //input element, text
+		i.setAttribute('type',"text");
+		i.setAttribute('value',Subgroup.code);
+		i.setAttribute('name',"code");
+		var i3 = document.createElement("input"); //input element, text
+		i3.setAttribute('type',"text");
+		i3.setAttribute('value',Subgroup.department);
+		i3.setAttribute('name',"department");;
+		var l = document.createElement("label"); //input element, text
+		l.innerHTML = "Code";
+		f.appendChild(l);
+		l.setAttribute("for",i);
+		f.appendChild(i);
+		f.appendChild(document.createElement("br"));
+		var l3 = document.createElement("label"); //input element, text
+		l3.innerHTML = "Department";
+		f.appendChild(l3);
+		l.setAttribute("for",i3);
+		f.appendChild(i3);
+		f.appendChild(document.createElement("br"));
+		var b = document.createElement("button"); //input element, text
+		var buttonurl = "post2()";
+		b.setAttribute('onClick',buttonurl);
+		b. innerHTML ="post Subgroup";
+		f.appendChild(b);
+		//console.log(String(f));
+		document.getElementById("form2").appendChild(f);
+	}
+}
+function deleteC(url){
+	var request = new XMLHttpRequest();
+	var subgroup= getSubgroup(url);
+	var code=subgroup.code
+	var jsonData = '{"code":' + JSON.stringify(code) + '}';
+	request.open("DELETE", url, false);
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
+	request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	request.send(jsonData);
+	listSubgroups();
+}
+function save(url){
+	var SubgroupJson = {};
+	SubgroupJson.url = document.getElementById("SubgroupForm").elements["url"].value;
+	SubgroupJson.code = document.getElementById("SubgroupForm").elements["code"].value;
+	SubgroupJson.department = document.getElementById("SubgroupForm").elements["department"].value;
+	SubgroupJson.groupid ="1";
+	SubgroupJson.degreeprogramid ="1";
+	//alert(JSON.stringify(SubgroupJson));
+	var request = new XMLHttpRequest();
+	request.open("PUT", url, false);
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
+	request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	request.send(JSON.stringify(SubgroupJson)); 
+	//alert(request.response);
+	
+}
+function post2(){
+	var SubgroupJson = {};
+	SubgroupJson.code = document.getElementById("SubgroupForm").elements["code"].value;
+	SubgroupJson.department = document.getElementById("SubgroupForm").elements["department"].value;
+	SubgroupJson.groupid ="1";
+	SubgroupJson.degreeprogramid ="1";
+	//alert(JSON.stringify(SubgroupJson));
+	var request = new XMLHttpRequest();
+	request.open("POST", "http://localhost:8210/Subgroups/" , false);
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
+	request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	request.send(JSON.stringify(SubgroupJson)); 
+	//alert(request.response);
+}
+function readCookie(name) {
+ var nameEQ = encodeURIComponent(name) + "=";
+ var ca = document.cookie.split(';');
+ for (var i = 0; i < ca.length; i++) {
+ var c = ca[i];
+ while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+ if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+ }
+ return null;
+}
+=======
+<button onclick="post()"> ADD NEW Subgroup</button>
+<div id="form2"></div>
+<div id="Subgroup"></div>
+<div id="form"></div>
+<script>
+var arrayOfSubgroups;
+listSubgroups();
+function listSubgroups(){
+	getSubgroups();
+	var tableContent="<table><tr><th>Code</th><th>Department</th></tr>";
+	console.log(arrayOfSubgroups);
+	for(var i=0;i<arrayOfSubgroups.length;i++){
+		tableContent+= "<tr><td>" + arrayOfSubgroups[i].code +"</td><td>"+ arrayOfSubgroups[i].department +"</td>";
+		//add edit and delete
+		tableContent+="<td><button onClick=edit('" +arrayOfSubgroups[i].url+ "')>Edit</button></td><td><button onClick=deleteC('" +arrayOfSubgroups[i].url+ "')>Delete</button></td></tr>";
+	}
+	tableContent+= "</table>";
+	console.log(tableContent);
+	document.getElementById("Subgroup").innerHTML = tableContent;
+}
+function getSubgroups(){
+	var request = new XMLHttpRequest();
+	request.open("GET", "http://localhost:8110/Subgroups/", false);
+	//var user_and_pass = document.getElementById("user").value + ":" +  document.getElementById("password").value;
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.send();
+	arrayOfSubgroups = JSON.parse(request.responseText);
+}
+function getSubgroup(url){
+	var request = new XMLHttpRequest();
+	request.open("GET", url, false);
+	//var user_and_pass = document.getElementById("user").value + ":" +  document.getElementById("password").value;
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.send();
+	arrayOfSubgroup = JSON.parse(request.responseText);
+	return arrayOfSubgroup;
+}
+function edit(url){
+	if(url!=null){
+		var Subgroup = getSubgroup(url);
+		//create form
+		var f = document.createElement("form");
+		f.setAttribute("id", "SubgroupForm");
+		var i = document.createElement("input"); //input element, text
+		i.setAttribute('type',"text");
+		i.setAttribute('value',Subgroup.code);
+		i.setAttribute('name',"code");
+		var i3 = document.createElement("input"); //input element, text
+		i3.setAttribute('type',"text");
+		i3.setAttribute('value',Subgroup.department);
+		i3.setAttribute('name',"department");
+		var h = document.createElement("input"); //input element, text
+		h.setAttribute('type',"hidden");
+		h.setAttribute('value',Subgroup.url);
+		h.setAttribute('name',"url");
+		f.appendChild(h);
+		var l = document.createElement("label"); //input element, text
+		l.innerHTML = "Code";
+		f.appendChild(l);
+		l.setAttribute("for",i);
+		f.appendChild(i);
+		f.appendChild(document.createElement("br"));
+		var l3 = document.createElement("label"); //input element, text
+		l3.innerHTML = "Department";
+		f.appendChild(l3);
+		l.setAttribute("for",i3);
+		f.appendChild(i3);
+		f.appendChild(document.createElement("br"));
+		var b = document.createElement("button"); //input element, text
+		var buttonurl = "save('" + url + "')";
+		b.setAttribute('onClick',buttonurl);
+		b. innerHTML ="Save Subgroup";
+		f.appendChild(b);
+		console.log(String(f));
+		document.getElementById("form").appendChild(f);
+	}
+}
+function post(){
+	if(1){
+		var Subgroup = {code:"", department:""};
+		//create form
+		var f = document.createElement("form");
+		f.setAttribute("id", "SubgroupForm");
+		var i = document.createElement("input"); //input element, text
+		i.setAttribute('type',"text");
+		i.setAttribute('value',Subgroup.code);
+		i.setAttribute('name',"code");
+		var i3 = document.createElement("input"); //input element, text
+		i3.setAttribute('type',"text");
+		i3.setAttribute('value',Subgroup.department);
+		i3.setAttribute('name',"department");;
+		var l = document.createElement("label"); //input element, text
+		l.innerHTML = "Code";
+		f.appendChild(l);
+		l.setAttribute("for",i);
+		f.appendChild(i);
+		f.appendChild(document.createElement("br"));
+		var l3 = document.createElement("label"); //input element, text
+		l3.innerHTML = "Department";
+		f.appendChild(l3);
+		l.setAttribute("for",i3);
+		f.appendChild(i3);
+		f.appendChild(document.createElement("br"));
+		var b = document.createElement("button"); //input element, text
+		var buttonurl = "post2()";
+		b.setAttribute('onClick',buttonurl);
+		b. innerHTML ="post Subgroup";
+		f.appendChild(b);
+		//console.log(String(f));
+		document.getElementById("form2").appendChild(f);
+	}
+}
+function deleteC(url){
+	var request = new XMLHttpRequest();
+	var subgroup= getSubgroup(url);
+	var code=subgroup.code
+	var jsonData = '{"code":' + JSON.stringify(code) + '}';
+	request.open("DELETE", url, false);
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
+	request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	request.send(jsonData);
+	listSubgroups();
+}
+function save(url){
+	var SubgroupJson = {};
+	SubgroupJson.url = document.getElementById("SubgroupForm").elements["url"].value;
+	SubgroupJson.code = document.getElementById("SubgroupForm").elements["code"].value;
+	SubgroupJson.department = document.getElementById("SubgroupForm").elements["department"].value;
+	SubgroupJson.groupid ="1";
+	SubgroupJson.degreeprogramid ="1";
+	//alert(JSON.stringify(SubgroupJson));
+	var request = new XMLHttpRequest();
+	request.open("PUT", url, false);
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
+	request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	request.send(JSON.stringify(SubgroupJson)); 
+	//alert(request.response);
+	
+}
+function post2(){
+	var SubgroupJson = {};
+	SubgroupJson.code = document.getElementById("SubgroupForm").elements["code"].value;
+	SubgroupJson.department = document.getElementById("SubgroupForm").elements["department"].value;
+	SubgroupJson.groupid ="1";
+	SubgroupJson.degreeprogramid ="1";
+	//alert(JSON.stringify(SubgroupJson));
+	var request = new XMLHttpRequest();
+	request.open("POST", "http://localhost:8110/Subgroups/" , false);
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
+	request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	request.send(JSON.stringify(SubgroupJson)); 
+	//alert(request.response);
+}
+function readCookie(name) {
+ var nameEQ = encodeURIComponent(name) + "=";
+ var ca = document.cookie.split(';');
+ for (var i = 0; i < ca.length; i++) {
+ var c = ca[i];
+ while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+ if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+ }
+ return null;
+}
+
+</script>

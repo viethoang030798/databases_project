@@ -1,0 +1,164 @@
+<button onclick="post()"> ADD Degree program</button>
+<div id="form2"></div>
+<div id="Degreeprogram"></div>
+<div id="form"></div>
+<script>
+var arrayOfDegreeprograms;
+listDegreeprograms();
+function listDegreeprograms(){
+	getDegreeprograms();
+	var tableContent="<table><tr><th>Code</th><th>Name</th></tr>";
+	console.log(arrayOfDegreeprograms);
+	for(var i=0;i<arrayOfDegreeprograms.length;i++){
+		tableContent+= "<tr><td>" + arrayOfDegreeprograms[i].code +"</td><td>"+ arrayOfDegreeprograms[i].name +"</td>";
+		//add edit and delete
+		tableContent+="<td><button onClick=edit('" +arrayOfDegreeprograms[i].url+ "')>Edit</button></td><td><button onClick=deleteC('" +arrayOfDegreeprograms[i].url+ "')>Delete</button></td></tr>";
+	}
+	tableContent+= "</table>";
+	console.log(tableContent);
+	document.getElementById("Degreeprogram").innerHTML = tableContent;
+}
+function getDegreeprograms(){
+	var request = new XMLHttpRequest();
+	request.open("GET", "http://localhost:8110/Degreeprograms/", false);
+	//var user_and_pass = document.getElementById("user").value + ":" +  document.getElementById("password").value;
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.send();
+	arrayOfDegreeprograms = JSON.parse(request.responseText);
+}
+function getDegreeprogram(url){
+	var request = new XMLHttpRequest();
+	request.open("GET", url, false);
+	//var user_and_pass = document.getElementById("user").value + ":" +  document.getElementById("password").value;
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.send();
+	arrayOfDegreeprogram = JSON.parse(request.responseText);
+	return arrayOfDegreeprogram;
+}
+function post(){
+	if(1){
+		var Degreeprogram = {code:"",name:"",};
+		//create form
+		var f = document.createElement("form");
+		f.setAttribute("id", "DegreeprogramForm");
+		var i = document.createElement("input"); //input element, text
+		i.setAttribute('type',"text");
+		i.setAttribute('value',Degreeprogram.code);
+		i.setAttribute('name',"code");
+		var i3 = document.createElement("input"); //input element, text
+		i3.setAttribute('type',"text");
+		i3.setAttribute('value',Degreeprogram.name);
+		i3.setAttribute('name',"name");
+		var l = document.createElement("label"); //input element, text
+		l.innerHTML = "Code";
+		f.appendChild(l);
+		l.setAttribute("for",i);
+		f.appendChild(i);
+		f.appendChild(document.createElement("br"));
+		var l3 = document.createElement("label"); //input element, text
+		l3.innerHTML = "name";
+		f.appendChild(l3);
+		l.setAttribute("for",i3);
+		f.appendChild(i3);
+		f.appendChild(document.createElement("br"));
+		var b = document.createElement("button"); //input element, text
+		var buttonurl = "Post1()";
+		b.setAttribute('onClick',buttonurl);
+		b. innerHTML ="Save Degreeprogram";
+		f.appendChild(b);
+		//console.log(String(f));
+		document.getElementById("form2").appendChild(f);
+	}
+}
+function edit(url){
+	if(url!=null){
+		var Degreeprogram = getDegreeprogram(url);
+		//create form
+		var f = document.createElement("form");
+		f.setAttribute("id", "DegreeprogramForm");
+		var i = document.createElement("input"); //input element, text
+		i.setAttribute('type',"text");
+		i.setAttribute('value',Degreeprogram.code);
+		i.setAttribute('name',"code");
+		var i3 = document.createElement("input"); //input element, text
+		i3.setAttribute('type',"text");
+		i3.setAttribute('value',Degreeprogram.name);
+		i3.setAttribute('name',"name");
+		var h = document.createElement("input"); //input element, text
+		h.setAttribute('type',"hidden");
+		h.setAttribute('value',Degreeprogram.url);
+		h.setAttribute('name',"url");
+		f.appendChild(h);
+		var l = document.createElement("label"); //input element, text
+		l.innerHTML = "Code";
+		f.appendChild(l);
+		l.setAttribute("for",i);
+		f.appendChild(i);
+		f.appendChild(document.createElement("br"));
+		var l3 = document.createElement("label"); //input element, text
+		l3.innerHTML = "name";
+		f.appendChild(l3);
+		l.setAttribute("for",i3);
+		f.appendChild(i3);
+		f.appendChild(document.createElement("br"));
+		var b = document.createElement("button"); //input element, text
+		var buttonurl = "save('" + url + "')";
+		b.setAttribute('onClick',buttonurl);
+		b. innerHTML ="Save Degreeprogram";
+		f.appendChild(b);
+		console.log(String(f));
+		document.getElementById("form").appendChild(f);
+	}
+}
+function deleteC(url){
+	var request = new XMLHttpRequest();
+	var Degree= getDegreeprogram(url);
+	var code=Degree.code
+	var jsonData = '{"code":' + JSON.stringify(code) + '}';
+	request.open("DELETE", url, false);
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
+	request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	request.send(jsonData);
+	listDegreeprograms()
+}
+function save(url){
+	var DegreeprogramJson = {};
+	DegreeprogramJson.url = document.getElementById("DegreeprogramForm").elements["url"].value;
+	DegreeprogramJson.code = document.getElementById("DegreeprogramForm").elements["code"].value;
+	DegreeprogramJson.name = document.getElementById("DegreeprogramForm").elements["name"].value;
+	//alert(JSON.stringify(DegreeprogramJson));
+	var request = new XMLHttpRequest();
+	request.open("PUT", url, false);
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
+	request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	request.send(JSON.stringify(DegreeprogramJson)); 
+	//alert(request.response);
+	 
+}
+function Post1(){
+	var DegreeprogramJson = {};
+	DegreeprogramJson.code = document.getElementById("DegreeprogramForm").elements["code"].value;
+	DegreeprogramJson.name = document.getElementById("DegreeprogramForm").elements["name"].value;
+	//alert(JSON.stringify(DegreeprogramJson));
+	var request = new XMLHttpRequest();
+	request.open("POST","http://localhost:8110/Degreeprograms/" , false);
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
+	request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	request.send(JSON.stringify(DegreeprogramJson)); 
+	//alert(request.response);
+	 
+}
+function readCookie(name) {
+ var nameEQ = encodeURIComponent(name) + "=";
+ var ca = document.cookie.split(';');
+ for (var i = 0; i < ca.length; i++) {
+ var c = ca[i];
+ while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+ if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+ }
+ return null;
+}
+</script>

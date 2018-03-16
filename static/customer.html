@@ -1,0 +1,139 @@
+<div id="customer"></div>
+<div id="form"></div>
+<script>
+var arrayOfCustomers;
+listCustomers();
+function listCustomers(){
+	getCustomers();
+	var tableContent="<table><tr><th>Customer</th><th>City</th></tr>";
+	console.log(arrayOfCustomers);
+	for(var i=0;i<arrayOfCustomers.length;i++){
+		tableContent+= "<tr><td>" + arrayOfCustomers[i].name +"</td><td>" + getCity(arrayOfCustomers[i].cityid)+"</td>";
+		//add edit and delete
+		tableContent+="<td><button onClick=edit('" +arrayOfCustomers[i].url+ "')>Edit</button></td><td><button onClick=deleteC('" +arrayOfCustomers[i].url+ "')>Delete</button></td></tr>";
+	}
+	tableContent+= "</table>";
+	console.log(tableContent);
+	document.getElementById("customer").innerHTML = tableContent;
+}
+
+function getCustomers(){
+	var request = new XMLHttpRequest();
+	request.open("GET", "http://localhost:8000/customers/", false);
+	//var user_and_pass = document.getElementById("user").value + ":" +  document.getElementById("password").value;
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.send();
+	arrayOfCustomers = JSON.parse(request.responseText);
+}
+
+function getCities(){
+	var request = new XMLHttpRequest();
+	request.open("GET", "http://localhost:8000/cities/", false);
+	//var user_and_pass = document.getElementById("user").value + ":" +  document.getElementById("password").value;
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.send();
+	return JSON.parse(request.responseText);
+}
+
+function getCustomer(url){
+	var request = new XMLHttpRequest();
+	request.open("GET", url, false);
+	//var user_and_pass = document.getElementById("user").value + ":" +  document.getElementById("password").value;
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.send();
+	arrayOfCustomer = JSON.parse(request.responseText);
+	return arrayOfCustomer;
+}
+
+
+function getCity(url){
+	var request = new XMLHttpRequest();
+	request.open("GET", url, false);
+	//var user_and_pass = document.getElementById("user").value + ":" +  document.getElementById("password").value;
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.send();
+	arrayOfCity = JSON.parse(request.responseText);
+	return(arrayOfCity.name);
+}
+
+function edit(url){
+	if(url!=null){
+		var customer = getCustomer(url);
+		//create form
+		var f = document.createElement("form");
+		f.setAttribute("id", "customerForm");
+		var i = document.createElement("input"); //input element, text
+		i.setAttribute('type',"text");
+		i.setAttribute('value',customer.name);
+		i.setAttribute('name',"name");
+
+		var h = document.createElement("input"); //input element, text
+		h.setAttribute('type',"hidden");
+		h.setAttribute('value',customer.url);
+		h.setAttribute('name',"url");
+		f.appendChild(h);
+
+
+
+		var l = document.createElement("label"); //input element, text
+		l.innerHTML = "Name";
+		f.appendChild(l);
+		l.setAttribute("for",i);
+		f.appendChild(i);
+		f.appendChild(document.createElement("br"));
+		var l2 = document.createElement("label"); //input element, text
+		l2.innerHTML = "City";
+		f.appendChild(l2);
+
+		var i2 = document.createElement("select");
+		i2.setAttribute('name',"city");
+		var cities = getCities();
+		for(var i=0;i<cities.length;i++){
+			var o2 = document.createElement("option");
+			o2.text = cities[i].name;
+			o2.value = cities[i].url;
+			i2.add(o2);
+			f.appendChild(i2);
+		}
+		f.appendChild(document.createElement("br"));
+		var b = document.createElement("button"); //input element, text
+		var buttonurl = "save('" + url + "')";
+		b.setAttribute('onClick',buttonurl);
+		b. innerHTML ="Save customer";
+		f.appendChild(b);
+		console.log(String(f));
+		document.getElementById("form").appendChild(f);
+	}
+}
+
+function deleteC(url){
+	alert("Delete " +url);
+}
+
+function save(url){
+	var customerJson = {};
+	customerJson.url = document.getElementById("customerForm").elements["url"].value;
+	customerJson.name = document.getElementById("customerForm").elements["name"].value;
+	customerJson.cityid = document.getElementById("customerForm").elements["city"].value;
+	//alert(JSON.stringify(customerJson));
+	var request = new XMLHttpRequest();
+	request.open("PUT", url, false);
+	request.setRequestHeader("Authorization", "Basic " + btoa("admin:password123"));
+	request.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
+	request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	request.send(JSON.stringify(customerJson)); 
+	//alert(request.response);
+	window.location = "localhost:8000/customers"; 
+}
+
+function readCookie(name) {
+ var nameEQ = encodeURIComponent(name) + "=";
+ var ca = document.cookie.split(';');
+ for (var i = 0; i < ca.length; i++) {
+ var c = ca[i];
+ while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+ if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+ }
+ return null;
+}
+</script>
